@@ -1,3 +1,4 @@
+// 使用命令： npm prisma init 创建该文件
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
@@ -8,6 +9,8 @@ generator client {
   provider = "prisma-client-js"
 }
 
+
+//连接数据库
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
@@ -57,21 +60,31 @@ model Subscription {
   customerId String?           @unique
 }
 
+
+
+enum PRESET {
+  HD
+  SD
+}
 model Media {
   id     String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   screen String?
   mic    String?
   camera String?
-  preset PRESET  @default(SD)
+  preset PRESET  @default(SD) //清晰度
   User   User?   @relation(fields: [userId], references: [id])
   userId String? @unique @db.Uuid
 }
 
+enum Type {
+  PERSONAL
+  PUBLIC
+}
 model WorkSpace {
   id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   type      Type
   name      String
-  User      User?    @relation(fields: [userId], references: [id])
+  User      User?    @relation(fields: [userId], references: [id]) //用户id和workspace id 经行绑定
   userId    String?  @db.Uuid
   createdAt DateTime @default(now())
   folders   Folder[]
@@ -134,16 +147,6 @@ model Invite {
   WorkSpace   WorkSpace? @relation(fields: [workSpaceId], references: [id])
   workSpaceId String?    @db.Uuid
   accepted    Boolean    @default(false)
-}
-
-enum Type {
-  PERSONAL
-  PUBLIC
-}
-
-enum PRESET {
-  HD
-  SD
 }
 
 enum SUBSCRIPTION_PLAN {
